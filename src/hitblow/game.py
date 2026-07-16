@@ -8,21 +8,32 @@
 
 from .core import judge, make_secret
 
-
 def play(digits=3):
     secret = make_secret(digits)
     print(f"Hit & Blow（{digits} 桁・重複なし）")
 
     # ===== ① 開始時に足す（難易度・あいさつ など）: ここに書く =====
+    from .limit import LimitManager
+    limit_manager = LimitManager(digits)
+    print(limit_manager.get_initial_message())
 
     tries = 0
     while True:
         guess = input("予想 > ").strip()
 
         # ===== ② 入力コマンドに足す（ヒント など）: ここに書く（import もここに） =====
-        # 例:  from .hint import hint
-        #      if guess == "h":
-        #          print(hint(secret)); continue
+        # 最終ターンの場合、結果表示後のフローを制御するために判定を先読みします。
+        if limit_manager.is_final_turn(tries):
+            # 正しい形式の場合のみ判定を行います。不正な場合はベースの処理に任せて再入力を促します。
+            if len(guess) == digits and guess.isdigit():
+                temp_hit, temp_blow = judge(secret, guess)
+                if temp_hit != digits:
+                    # 不正解の場合はここで結果を表示し、ゲームオーバー処理を行って終了します。
+                    # （正解の場合はベースの処理に任せ、③の勝利時処理へ進ませます）
+                    tries += 1
+                    print(f"  Hit={temp_hit}  Blow={temp_blow}")
+                    limit_manager.print_game_over(secret)
+                    break
 
         if len(guess) != digits or not guess.isdigit():
             print(f"{digits} 桁の数字で入力してね")
