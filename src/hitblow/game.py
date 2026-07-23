@@ -52,6 +52,9 @@ def play():
         if hit == digits:
 
             # ===== ③ 勝利時に足す（スコア・履歴 など）: ここに書く =====
-
+            from .score import calculate_score
+            # limit_manager から最大試行回数を取得して計算関数へ渡す
+            score = calculate_score(digits, tries, limit_manager.max_tries)
             print(f"正解！ {tries} 回で当たり（答え {secret}）")
+            print(f"獲得スコア: {score} 点")
             break
