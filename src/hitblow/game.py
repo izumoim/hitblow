@@ -5,7 +5,6 @@
 
 from .core import judge, make_secret
 
-
 def play():
 
     # ===== ① 開始時に足す（難易度・あいさつ など）: ここに書く =====
@@ -28,6 +27,12 @@ def play():
         guess = input("予想 > ").strip()
 
         # ===== ② 入力コマンドに足す（ヒント など）: ここに書く（import もここに） =====
+        from .sum_info import calculate_sum
+        
+        # 4回目の回答時のみ表示するための文字列を用意します
+        sum_info_str = ""
+        if tries == 3:
+            sum_info_str = f"  和={calculate_sum(secret)}"
 
         if limit_manager.is_final_turn(tries):
             if len(guess) == digits and guess.isdigit():
@@ -35,7 +40,8 @@ def play():
 
                 if temp_hit != digits:
                     tries += 1
-                    print(f"  Hit={temp_hit}  Blow={temp_blow}")
+                    # sum_info_str を末尾に追加（4回目以外は空文字のため影響なし）
+                    print(f"  Hit={temp_hit}  Blow={temp_blow}{sum_info_str}")
                     limit_manager.print_game_over(secret)
                     break
 
@@ -47,7 +53,8 @@ def play():
 
         hit, blow = judge(secret, guess)
 
-        print(f"  Hit={hit}  Blow={blow}")
+        # sum_info_str を末尾に追加
+        print(f"  Hit={hit}  Blow={blow}{sum_info_str}")
 
         if hit == digits:
 
